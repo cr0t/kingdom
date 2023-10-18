@@ -1,6 +1,26 @@
 defmodule Kingdom.Treasury do
   use GenServer
 
+  ### Client API
+
+  def open() do
+    GenServer.start_link(__MODULE__, 0, name: __MODULE__)
+  end
+
+  def store(amount) do
+    GenServer.cast(__MODULE__, {:store, amount})
+  end
+
+  def withdraw(amount) do
+    GenServer.cast(__MODULE__, {:withdraw, amount})
+  end
+
+  def get_balance() do
+    GenServer.call(__MODULE__, :balance)
+  end
+
+  ### GenServer's Kitchen
+
   def init(balance) do
     {:ok, balance}
   end

@@ -64,3 +64,52 @@ end
 > ```
 >
 > ...but it would be better to add some nice API for its internal clients.
+
+### Introduce an API for the Treasury Module
+
+To hide the implementation details, we will add client commands in the same module. We shall also use the module's name when spawning a new process via `start_link` to easily refer to this server inside of the application.
+
+```elixir
+defmodule Kingdom.Treasury do
+  use GenServer
+
+  ### Client API
+
+  def open() do
+    GenServer.start_link(__MODULE__, 0, name: __MODULE__)
+  end
+
+  def store(amount) do
+    GenServer.cast(__MODULE__, {:store, amount})
+  end
+
+  def withdraw(amount) do
+    GenServer.cast(__MODULE__, {:withdraw, amount})
+  end
+
+  def get_balance() do
+    GenServer.call(__MODULE__, :balance)
+  end
+
+  ### GenServer's Kitchen
+
+  # ...the code we wrote before...
+end
+```
+
+> [!note]
+>
+> Here is how we can use it with this nice API:
+>
+> ```console
+> iex> Kingdom.Treasury.open()
+> {:ok, #PID<0.159.0>}
+> iex> Kingdom.Treasury.store(100)
+> :ok
+> iex> Kingdom.Treasury.store(500)
+> :ok
+> iex> Kingdom.Treasury.withdraw(300)
+> :ok
+> iex> Kingdom.Treasury.get_balance()
+> 300
+> ```
