@@ -19,6 +19,10 @@ defmodule Kingdom.Treasury do
     GenServer.call(__MODULE__, :balance)
   end
 
+  def crash() do
+    GenServer.call(__MODULE__, :apocalypse)
+  end
+
   ### GenServer's Kitchen
 
   def init(balance) do
@@ -35,5 +39,9 @@ defmodule Kingdom.Treasury do
 
   def handle_call(:balance, _from, balance) do
     {:reply, balance, balance}
+  end
+
+  def handle_call(:apocalypse, _from, _balance) do
+    raise "Oops"
   end
 end

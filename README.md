@@ -113,3 +113,45 @@ end
 > iex> Kingdom.Treasury.get_balance()
 > 300
 > ```
+
+### Simulate Crashes for Treasury
+
+We can simulate process crashes by adding an API call and the its handler that will raise some exception:
+
+```elixir
+# ...
+
+def crash() do
+  GenServer.call(__MODULE__, :apocalypse)
+end
+
+# ...
+
+def handle_call(:apocalypse, _from, _balance) do
+  raise "Oops"
+end
+
+# ...
+```
+
+> [!note]
+>
+> How this looks in action:
+>
+> ```console
+> iex> Kingdom.Treasury.open()
+> {:ok, #PID<0.161.0>}
+> iex> Kingdom.Treasury.store(100)
+> :ok
+> iex> Kingdom.Treasury.get_balance()
+> 100
+> iex> Kingdom.Treasury.crash
+> ** (exit) exited in: GenServer.call(Kingdom.Treasury, :apocalypse, 5000)
+>     ** (EXIT) an exception was raised:
+>         ** (RuntimeError) Oops
+> # ...
+> iex> Kingdom.Treasury.get_balance()
+> ** (exit) exited in: GenServer.call(Kingdom.Treasury, :balance, 5000)
+>     ** (EXIT) no process: the process is not alive or there's no process currently associated with the given name, possibly because its application isn't started
+> # ...
+> ```
