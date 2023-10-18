@@ -27,3 +27,40 @@ defmodule Kingdom.Treasury do
   end
 end
 ```
+
+### Handle Adding, Subtracting, and Balance Actions
+
+We implement a few more callbacks for our `Treasury` module to make useful to represent a balance.
+
+```elixir
+# ...
+
+def handle_cast({:store, amount}, balance) do
+  {:noreply, balance + amount }
+end
+
+def handle_cast({:withdraw, amount}, balance) do
+  {:noreply, balance - amount}
+end
+
+def handle_call(:balance, _from, balance) do
+  {:reply, balance, balance}
+end
+
+# ...
+```
+
+> [!note]
+>
+> We can already start using this server:
+>
+> ```console
+> iex> {:ok, pid} = GenServer.start_link(Kingdom.Treasury, 0)
+> {:ok, #PID<0.167.0>}
+> iex> GenServer.cast(pid, {:store, 100})
+> :ok
+> iex> GenServer.call(pid, :balance)
+> 100
+> ```
+>
+> ...but it would be better to add some nice API for its internal clients.
